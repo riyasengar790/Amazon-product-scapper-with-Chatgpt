@@ -1,0 +1,50 @@
+from bs4 import BeautifulSoup
+import openpyxl
+
+# Read the HTML file
+with open("Amazon.html", "r", encoding="utf-8") as file:
+    html_content = file.read()
+
+# Parse the HTML content
+soup = BeautifulSoup(html_content, "html.parser")
+
+# Find all divs with specified class
+product_divs = soup.find_all("div", class_="puis-card-container s-card-container s-overflow-hidden aok-relative puis-include-content-margin puis puis-v2laelakto18k82o7cy47f2sjt0 s-latency-cf-section puis-card-border")
+
+# Create a new Excel workbook and select the active worksheet
+workbook = openpyxl.Workbook()
+worksheet = workbook.active
+
+# Set the header row
+worksheet.append(["Product_Name", "Product_Price", "Product_Reviews"])
+
+# Loop through each product div
+for div in product_divs:
+    # Try to find the product name
+    product_name_elem = div.find("span", class_="a-size-medium a-color-base a-text-normal")
+    if product_name_elem:
+        product_name = product_name_elem.text.strip()
+    else:
+        product_name = " "
+
+    # Try to find the product price
+    product_price_elem = div.find("span", class_="a-price-whole")
+    if product_price_elem:
+        product_price = product_price_elem.text.strip()
+    else:
+        product_price = " "
+
+    # Try to find the product reviews
+    product_reviews_elem = div.find("span", class_="a-icon-alt")
+    if product_reviews_elem:
+        product_reviews = product_reviews_elem.text.strip()
+    else:
+        product_reviews = " "
+
+    # Write the data to the Excel file
+    worksheet.append([product_name, product_price, product_reviews])
+
+# Save the workbook
+workbook.save(filename="Amazon_Products.xlsx")
+
+
